@@ -5,267 +5,102 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>File Splitter — Govspend India</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <style>
-/* ── DESIGN TOKENS: Professional Corporate Blue/Slate ── */
-:root {
-  --bg:       #F1F5F9;
-  --surface:  #FFFFFF;
-  --surface2: #F8FAFC;
-  --surface3: #EFF6FF;
-  --border:   #CBD5E1;
-  --border2:  #E2E8F0;
-  --accent:   #1D4ED8;
-  --accent-h: #1E40AF;
-  --accent-l: #EFF6FF;
-  --accent-t: rgba(29,78,216,.08);
-  --text:     #0F172A;
-  --text2:    #475569;
-  --text3:    #94A3B8;
-  --success:  #059669;
-  --success-l:#ECFDF5;
-  --error:    #DC2626;
-  --error-l:  #FEF2F2;
-  --warn:     #D97706;
-  --warn-l:   #FFFBEB;
-  --radius:   8px;
-  --radius-sm:5px;
-  --shadow:   0 1px 3px rgba(15,23,42,.08), 0 1px 2px rgba(15,23,42,.06);
-  --shadow-md:0 4px 16px rgba(15,23,42,.10), 0 2px 6px rgba(15,23,42,.06);
-  --mono: 'IBM Plex Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
+:root{
+  --bg:#F1F5F9;--surface:#FFFFFF;--surface2:#F8FAFC;--surface3:#EFF6FF;
+  --border:#CBD5E1;--border2:#E2E8F0;
+  --accent:#1D4ED8;--accent-h:#1E40AF;--accent-l:#EFF6FF;--accent-t:rgba(29,78,216,.08);
+  --text:#0F172A;--text2:#475569;--text3:#94A3B8;
+  --success:#059669;--success-l:#ECFDF5;
+  --error:#DC2626;--error-l:#FEF2F2;
+  --warn:#D97706;--warn-l:#FFFBEB;
+  --radius:8px;--radius-sm:5px;
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.06);
+  --shadow-md:0 4px 16px rgba(15,23,42,.10),0 2px 6px rgba(15,23,42,.06);
+  --mono:'IBM Plex Mono',monospace;--sans:'DM Sans',sans-serif;
 }
-.dark {
-  --bg:       #0F172A;
-  --surface:  #1E293B;
-  --surface2: #293548;
-  --surface3: #1e3a6e;
-  --border:   #334155;
-  --border2:  #2D3F55;
-  --accent:   #3B82F6;
-  --accent-h: #60A5FA;
-  --accent-l: #1e3a6e;
-  --accent-t: rgba(59,130,246,.1);
-  --text:     #F1F5F9;
-  --text2:    #94A3B8;
-  --text3:    #64748B;
-  --success:  #10B981;
-  --success-l:#064E3B;
-  --error:    #F87171;
-  --error-l:  #450A0A;
-  --warn:     #FBBF24;
-  --warn-l:   #451A03;
-  --shadow:   0 1px 3px rgba(0,0,0,.3);
-  --shadow-md:0 4px 20px rgba(0,0,0,.4);
+.dark{
+  --bg:#0F172A;--surface:#1E293B;--surface2:#293548;--surface3:#1e3a6e;
+  --border:#334155;--border2:#2D3F55;
+  --accent:#3B82F6;--accent-h:#60A5FA;--accent-l:#1e3a6e;--accent-t:rgba(59,130,246,.1);
+  --text:#F1F5F9;--text2:#94A3B8;--text3:#64748B;
+  --success:#10B981;--success-l:#064E3B;
+  --error:#F87171;--error-l:#450A0A;
+  --warn:#FBBF24;--warn-l:#451A03;
+  --shadow:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 20px rgba(0,0,0,.4);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;transition:background .25s,color .25s;}
-
-/* ── HEADER ── */
-.header{
-  background:var(--surface);
-  border-bottom:1px solid var(--border2);
-  padding:0 48px;
-  display:flex;align-items:center;justify-content:space-between;
-  height:68px;position:sticky;top:0;z-index:200;
-  box-shadow:var(--shadow);
-}
+.header{background:var(--surface);border-bottom:1px solid var(--border2);padding:0 48px;display:flex;align-items:center;justify-content:space-between;height:68px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow);}
 .header-brand{display:flex;align-items:center;gap:14px;}
-.brand-mark{
-  width:38px;height:38px;
-  background:var(--accent);
-  border-radius:var(--radius-sm);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
+.brand-mark{width:38px;height:38px;background:var(--accent);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .brand-mark svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
 .brand-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.02em;}
 .brand-org{font-size:11px;font-weight:500;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-top:1px;font-family:var(--mono);}
 .header-right{display:flex;align-items:center;gap:10px;}
-.type-chip{
-  font-family:var(--mono);font-size:10px;font-weight:600;
-  padding:3px 8px;border-radius:4px;
-  letter-spacing:.06em;
-}
-.tc-csv {background:rgba(5,150,105,.1); color:var(--success); border:1px solid rgba(5,150,105,.25);}
-.tc-xl  {background:rgba(37,99,235,.1);  color:var(--accent);  border:1px solid rgba(37,99,235,.25);}
-.tc-pdf {background:rgba(220,38,38,.1);  color:var(--error);   border:1px solid rgba(220,38,38,.25);}
-.tc-zip {background:rgba(109,40,217,.1); color:#7C3AED;        border:1px solid rgba(109,40,217,.25);}
-.btn-theme{
-  display:flex;align-items:center;gap:7px;
-  cursor:pointer;padding:6px 14px;
-  border:1px solid var(--border);
-  border-radius:var(--radius-sm);
-  background:var(--surface2);
-  font-size:12px;font-family:var(--sans);font-weight:500;
-  color:var(--text2);transition:all .2s;user-select:none;
-}
+.type-chip{font-family:var(--mono);font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;letter-spacing:.06em;}
+.tc-csv{background:rgba(5,150,105,.1);color:var(--success);border:1px solid rgba(5,150,105,.25);}
+.tc-xl{background:rgba(37,99,235,.1);color:var(--accent);border:1px solid rgba(37,99,235,.25);}
+.tc-pdf{background:rgba(220,38,38,.1);color:var(--error);border:1px solid rgba(220,38,38,.25);}
+.tc-zip{background:rgba(109,40,217,.1);color:#7C3AED;border:1px solid rgba(109,40,217,.25);}
+.btn-theme{display:flex;align-items:center;gap:7px;cursor:pointer;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-size:12px;font-family:var(--sans);font-weight:500;color:var(--text2);transition:all .2s;user-select:none;}
 .btn-theme:hover{border-color:var(--accent);color:var(--accent);}
 .btn-theme svg{width:14px;height:14px;}
-
-/* ── LAYOUT ── */
 .main{max-width:880px;margin:0 auto;padding:36px 24px 80px;}
-
-/* ── STEP HEADER ── */
-.step-header{
-  display:flex;align-items:center;gap:12px;
-  margin-bottom:10px;margin-top:8px;
-}
-.step-num{
-  width:26px;height:26px;border-radius:50%;
-  background:var(--accent);color:#fff;
-  font-size:12px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-family:var(--mono);
-}
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;margin-top:8px;}
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono);}
 .step-title{font-size:13px;font-weight:600;color:var(--text2);letter-spacing:.01em;text-transform:uppercase;}
-
-/* ── CARD ── */
-.card{
-  background:var(--surface);
-  border:1px solid var(--border2);
-  border-radius:var(--radius);
-  padding:24px;
-  margin-bottom:24px;
-  box-shadow:var(--shadow);
-  transition:border-color .2s;
-}
-
-/* ── DROPZONE ── */
-.dropzone{
-  border:2px dashed var(--border);
-  border-radius:var(--radius);
-  padding:44px 24px;
-  text-align:center;cursor:pointer;
-  transition:all .2s;
-  background:var(--surface2);
-}
-.dropzone:hover{border-color:var(--accent);background:var(--accent-t);}
-.dropzone.dragover{border-color:var(--accent);background:var(--accent-t);border-style:solid;}
-.dz-icon{
-  width:52px;height:52px;
-  background:var(--surface3);
-  border:1px solid var(--border);
-  border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 16px;
-}
+.card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:24px;margin-bottom:24px;box-shadow:var(--shadow);}
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:44px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2);}
+.dropzone:hover,.dropzone.dragover{border-color:var(--accent);background:var(--accent-t);}
+.dropzone.dragover{border-style:solid;}
+.dz-icon{width:52px;height:52px;background:var(--surface3);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
 .dz-icon svg{width:24px;height:24px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 .dz-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;}
 .dz-sub{font-size:13px;color:var(--text2);margin-bottom:18px;}
-.btn-browse{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:13px;font-weight:600;
-  padding:9px 22px;border-radius:var(--radius-sm);
-  background:var(--accent);color:#fff;
-  border:none;cursor:pointer;transition:all .2s;
-  box-shadow:0 1px 4px rgba(29,78,216,.3);
-}
-.btn-browse:hover{background:var(--accent-h);transform:translateY(-1px);box-shadow:0 4px 12px rgba(29,78,216,.35);}
+.btn-browse{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;padding:9px 22px;border-radius:var(--radius-sm);background:var(--accent);color:#fff;border:none;cursor:pointer;transition:all .2s;}
+.btn-browse:hover{background:var(--accent-h);transform:translateY(-1px);}
 .ft-row{display:flex;justify-content:center;gap:6px;margin-top:18px;flex-wrap:wrap;}
-
-/* ── FILE INFO BAR ── */
-.file-bar{
-  display:none;align-items:center;gap:14px;
-  padding:13px 18px;
-  background:var(--accent-l);
-  border:1px solid rgba(29,78,216,.2);
-  border-radius:var(--radius-sm);
-  margin-top:14px;
-}
+.file-bar{display:none;align-items:center;gap:14px;padding:13px 18px;background:var(--accent-l);border:1px solid rgba(29,78,216,.2);border-radius:var(--radius-sm);margin-top:14px;}
 .dark .file-bar{border-color:rgba(59,130,246,.25);}
 .file-bar.show{display:flex;}
 .fb-icon{font-size:22px;line-height:1;}
 .fb-name{font-size:13px;font-weight:600;color:var(--text);}
 .fb-meta{font-size:11px;color:var(--text2);margin-top:1px;font-family:var(--mono);}
-.fb-close{
-  margin-left:auto;background:none;border:none;
-  color:var(--text3);cursor:pointer;padding:4px;
-  border-radius:4px;transition:all .2s;font-size:16px;
-}
+.fb-close{margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:4px;transition:all .2s;}
 .fb-close:hover{color:var(--error);background:var(--error-l);}
-
-/* ── ALERT BANNERS ── */
-.alert{
-  display:none;align-items:flex-start;gap:10px;
-  padding:11px 16px;border-radius:var(--radius-sm);
-  font-size:12px;font-weight:500;margin-top:12px;
-  border:1px solid;
-}
+.alert{display:none;align-items:flex-start;gap:10px;padding:11px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;margin-top:12px;border:1px solid;}
 .alert.show{display:flex;}
 .alert-warn{background:var(--warn-l);border-color:rgba(217,119,6,.3);color:var(--warn);}
 .dark .alert-warn{border-color:rgba(251,191,36,.25);}
 .alert svg{width:15px;height:15px;flex-shrink:0;margin-top:1px;}
-
-/* ── MODE GRID ── */
 .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.mode-card{
-  padding:16px;border:2px solid var(--border2);
-  border-radius:var(--radius);cursor:pointer;
-  transition:all .2s;background:var(--surface2);
-  position:relative;
-}
+.mode-card{padding:16px;border:2px solid var(--border2);border-radius:var(--radius);cursor:pointer;transition:all .2s;background:var(--surface2);position:relative;}
 .mode-card:hover{border-color:var(--border);box-shadow:var(--shadow);}
 .mode-card.sel{border-color:var(--accent);background:var(--accent-l);}
 .dark .mode-card.sel{background:var(--accent-t);}
 .mode-card.sel .mc-badge{background:var(--accent);color:#fff;border-color:var(--accent);}
-.mc-badge{
-  display:inline-flex;align-items:center;
-  font-family:var(--mono);font-size:9px;font-weight:600;
-  padding:2px 8px;border-radius:4px;letter-spacing:.08em;
-  background:var(--surface);color:var(--text3);
-  border:1px solid var(--border);
-  margin-bottom:9px;transition:all .2s;text-transform:uppercase;
-}
+.mc-badge{display:inline-flex;align-items:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:.08em;background:var(--surface);color:var(--text3);border:1px solid var(--border);margin-bottom:9px;transition:all .2s;text-transform:uppercase;}
 .mc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;}
 .mc-desc{font-size:11px;color:var(--text2);line-height:1.55;}
-.mc-check{
-  position:absolute;top:12px;right:12px;
-  width:18px;height:18px;border-radius:50%;
-  background:var(--accent);
-  display:none;align-items:center;justify-content:center;
-}
+.mc-check{position:absolute;top:12px;right:12px;width:18px;height:18px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center;}
 .mc-check svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
 .mode-card.sel .mc-check{display:flex;}
-
-/* ── PARAMS ── */
 .param-row{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;}
 .param-group{display:flex;flex-direction:column;gap:5px;}
 .param-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.04em;text-transform:uppercase;}
-.param-input{
-  background:var(--surface2);border:1.5px solid var(--border);
-  border-radius:var(--radius-sm);padding:9px 13px;
-  font-family:var(--mono);font-size:13px;font-weight:500;
-  color:var(--text);width:160px;
-  transition:border-color .2s,box-shadow .2s;outline:none;
-}
+.param-input{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 13px;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text);width:160px;transition:border-color .2s,box-shadow .2s;outline:none;}
 .param-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-t);}
 .param-input.sm{width:110px;}
-.param-input.err{border-color:var(--error)!important;box-shadow:0 0 0 3px rgba(220,38,38,.1)!important;}
+.param-input.err{border-color:var(--error)!important;}
 .param-hint{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px;}
 .param-err-msg{font-size:11px;color:var(--error);display:none;margin-top:2px;}
 .param-err-msg.show{display:block;}
-
-/* ── PROGRESS ── */
-.prog-track{
-  height:8px;background:var(--surface2);
-  border-radius:4px;overflow:hidden;
-  border:1px solid var(--border2);
-  margin-bottom:10px;
-}
-.prog-fill{
-  height:100%;background:var(--accent);
-  border-radius:4px;width:0%;
-  transition:width .35s cubic-bezier(.4,0,.2,1);
-  position:relative;overflow:hidden;
-}
-.prog-fill::after{
-  content:'';position:absolute;top:0;right:0;bottom:0;width:40px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35));
-  animation:shim 1.2s ease infinite;
-}
+.prog-track{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid var(--border2);margin-bottom:10px;}
+.prog-fill{height:100%;background:var(--accent);border-radius:4px;width:0%;transition:width .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;}
+.prog-fill::after{content:'';position:absolute;top:0;right:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35));animation:shim 1.2s ease infinite;}
 @keyframes shim{0%,100%{opacity:0}50%{opacity:1}}
 .prog-meta{display:flex;justify-content:space-between;align-items:center;}
 .status-row{display:flex;align-items:center;gap:8px;}
@@ -276,124 +111,54 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .status-txt{font-size:12px;font-weight:500;color:var(--text2);}
 .prog-pct{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text2);}
-
-/* ── ACTION BUTTONS ── */
 .btn-row{display:flex;gap:10px;margin-top:18px;}
-.btn-run{
-  flex:1;display:flex;align-items:center;justify-content:center;gap:9px;
-  font-size:14px;font-weight:700;padding:13px 24px;
-  border-radius:var(--radius);background:var(--accent);color:#fff;
-  border:none;cursor:pointer;transition:all .2s;letter-spacing:.01em;
-  box-shadow:0 1px 4px rgba(29,78,216,.3);
-}
-.btn-run:hover:not(:disabled){background:var(--accent-h);transform:translateY(-1px);box-shadow:0 5px 16px rgba(29,78,216,.35);}
+.btn-run{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;font-size:14px;font-weight:700;padding:13px 24px;border-radius:var(--radius);background:var(--accent);color:#fff;border:none;cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(29,78,216,.3);}
+.btn-run:hover:not(:disabled){background:var(--accent-h);transform:translateY(-1px);}
 .btn-run:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
-.btn-clear{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  font-size:13px;font-weight:600;padding:13px 20px;
-  border-radius:var(--radius);background:var(--surface2);
-  color:var(--text2);border:1.5px solid var(--border);
-  cursor:pointer;transition:all .2s;
-}
+.btn-clear{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;padding:13px 20px;border-radius:var(--radius);background:var(--surface2);color:var(--text2);border:1.5px solid var(--border);cursor:pointer;transition:all .2s;}
 .btn-clear:hover{border-color:var(--error);color:var(--error);background:var(--error-l);}
-.btn-clear svg{width:15px;height:15px;}
-
-/* ── RESULT PANEL ── */
-.result-box{
-  display:none;margin-top:18px;padding:18px 20px;
-  border:1.5px solid var(--success);
-  border-radius:var(--radius);
-  background:var(--success-l);
-}
+.result-box{display:none;margin-top:18px;padding:18px 20px;border:1.5px solid var(--success);border-radius:var(--radius);background:var(--success-l);}
 .result-box.show{display:block;}
 .rb-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.rb-icon{
-  width:32px;height:32px;border-radius:50%;
-  background:var(--success);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
+.rb-icon{width:32px;height:32px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .rb-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
 .rb-title{font-size:14px;font-weight:700;color:var(--text);}
 .rb-sub{font-size:12px;color:var(--text2);}
 .rb-stats{display:flex;gap:24px;flex-wrap:wrap;padding:14px 0;border-top:1px solid rgba(5,150,105,.2);border-bottom:1px solid rgba(5,150,105,.2);margin:12px 0;}
 .rb-stat{font-size:11px;color:var(--text2);}
 .rb-stat strong{font-size:20px;font-weight:700;color:var(--text);display:block;line-height:1.2;margin-bottom:3px;font-family:var(--mono);}
-.btn-dl{
-  display:inline-flex;align-items:center;gap:9px;
-  font-size:13px;font-weight:700;padding:10px 22px;
-  border-radius:var(--radius-sm);background:var(--success);color:#fff;
-  border:none;cursor:pointer;transition:all .2s;
-  box-shadow:0 1px 4px rgba(5,150,105,.3);
-}
-.btn-dl:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 4px 12px rgba(5,150,105,.35);}
+.btn-dl{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:700;padding:10px 22px;border-radius:var(--radius-sm);background:var(--success);color:#fff;border:none;cursor:pointer;transition:all .2s;}
+.btn-dl:hover{opacity:.88;transform:translateY(-1px);}
 .btn-dl svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
-
-/* ── GUIDE ── */
 .guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
 .guide-item{display:flex;gap:13px;}
-.guide-num{
-  width:28px;height:28px;flex-shrink:0;
-  border-radius:var(--radius-sm);
-  background:var(--accent-l);border:1px solid rgba(29,78,216,.2);
-  font-family:var(--mono);font-size:11px;font-weight:700;
-  color:var(--accent);display:flex;align-items:center;justify-content:center;
-}
+.guide-num{width:28px;height:28px;flex-shrink:0;border-radius:var(--radius-sm);background:var(--accent-l);border:1px solid rgba(29,78,216,.2);font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);display:flex;align-items:center;justify-content:center;}
 .guide-t{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;}
 .guide-d{font-size:11px;color:var(--text2);line-height:1.6;}
 .compat{width:100%;border-collapse:collapse;font-size:11px;}
-.compat th{
-  padding:8px 12px;background:var(--surface2);
-  color:var(--text2);font-weight:700;text-align:left;
-  border:1px solid var(--border2);font-family:var(--mono);
-  letter-spacing:.04em;font-size:10px;
-}
+.compat th{padding:8px 12px;background:var(--surface2);color:var(--text2);font-weight:700;text-align:left;border:1px solid var(--border2);font-family:var(--mono);font-size:10px;}
 .compat td{padding:8px 12px;border:1px solid var(--border2);text-align:center;font-weight:600;}
-.compat .c-yes{color:var(--success);}
-.compat .c-no{color:var(--error);}
-.compat .c-apr{color:var(--warn);}
+.compat .c-yes{color:var(--success);}.compat .c-apr{color:var(--warn);}
 .compat .c-lbl{text-align:left;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text);}
 .compat-note{font-size:10px;color:var(--text3);margin-top:8px;font-family:var(--mono);}
-
-/* ── DIVIDER ── */
 .divider{display:flex;align-items:center;gap:12px;margin:8px 0 18px;}
 .divider-line{flex:1;height:1px;background:var(--border2);}
 .divider-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-family:var(--mono);}
-
-/* ── TOAST ── */
-.toast{
-  position:fixed;bottom:28px;right:28px;
-  display:flex;align-items:center;gap:10px;
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:13px 18px;
-  font-size:13px;font-weight:500;
-  box-shadow:var(--shadow-md);
-  transform:translateY(80px);opacity:0;
-  transition:all .3s cubic-bezier(.4,0,.2,1);
-  z-index:999;max-width:360px;
-}
+.toast{position:fixed;bottom:28px;right:28px;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 18px;font-size:13px;font-weight:500;box-shadow:var(--shadow-md);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:999;max-width:360px;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.toast.s .toast-dot{background:var(--success);}
-.toast.e .toast-dot{background:var(--error);}
-.toast.w .toast-dot{background:var(--warn);}
-.toast.s{border-left:3px solid var(--success);}
-.toast.e{border-left:3px solid var(--error);}
-.toast.w{border-left:3px solid var(--warn);}
-
+.toast.s .toast-dot{background:var(--success);}.toast.e .toast-dot{background:var(--error);}.toast.w .toast-dot{background:var(--warn);}
+.toast.s{border-left:3px solid var(--success);}.toast.e{border-left:3px solid var(--error);}.toast.w{border-left:3px solid var(--warn);}
 .hidden{display:none!important;}
 input[type=file]{display:none;}
 @media(max-width:620px){
   .mode-grid,.guide-grid{grid-template-columns:1fr;}
-  .header{padding:0 20px;}
-  .main{padding:24px 16px 60px;}
-  .type-chip{display:none;}
-  .param-input{width:120px;}
+  .header{padding:0 20px;}.main{padding:24px 16px 60px;}
+  .type-chip{display:none;}.param-input{width:120px;}
 }
 </style>
 </head>
 <body>
-
-<!-- ════ HEADER ════ -->
 <header class="header">
   <div class="header-brand">
     <div class="brand-mark">
@@ -409,7 +174,7 @@ input[type=file]{display:none;}
     <span class="type-chip tc-xl">EXCEL</span>
     <span class="type-chip tc-pdf">PDF</span>
     <span class="type-chip tc-zip">ZIP</span>
-    <button class="btn-theme" onclick="toggleTheme()" id="themeBtn">
+    <button class="btn-theme" onclick="toggleTheme()">
       <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
       </svg>
@@ -419,12 +184,7 @@ input[type=file]{display:none;}
 </header>
 
 <main class="main">
-
-  <!-- ── STEP 1 ── -->
-  <div class="step-header">
-    <div class="step-num">1</div>
-    <div class="step-title">Select Source File</div>
-  </div>
+  <div class="step-header"><div class="step-num">1</div><div class="step-title">Select Source File</div></div>
   <div class="card">
     <div class="dropzone" id="dropzone"
          onclick="document.getElementById('fi').click()"
@@ -446,7 +206,6 @@ input[type=file]{display:none;}
         <span class="type-chip tc-zip">ZIP</span>
       </div>
     </div>
-
     <div class="file-bar" id="fileBar">
       <span id="fbIcon" class="fb-icon">📄</span>
       <div>
@@ -457,44 +216,39 @@ input[type=file]{display:none;}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-
     <div class="alert alert-warn" id="bigFileWarn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span>File is larger than 50 MB. Processing may be slow. Large PDFs/Excel files can run out of browser memory — consider splitting in smaller batches.</span>
+      <span id="bigFileWarnTxt">Large file detected. Processing in background — page will stay responsive. Do not close this tab.</span>
     </div>
     <input type="file" id="fi" accept=".csv,.xlsx,.xls,.pdf,.zip" onchange="onFileSelect(this)">
   </div>
 
-  <!-- ── STEP 2 ── -->
-  <div class="step-header">
-    <div class="step-num">2</div>
-    <div class="step-title">Choose Splitting Mode</div>
-  </div>
+  <div class="step-header"><div class="step-num">2</div><div class="step-title">Choose Splitting Mode</div></div>
   <div class="card">
     <div class="mode-grid">
       <div class="mode-card sel" data-mode="parts" onclick="setMode('parts')">
         <span class="mc-badge">Equal Parts</span>
         <div class="mc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="mc-title">Split into N Equal Parts</div>
-        <div class="mc-desc">Divides total content into an exact number of equal-sized output files. Remainder rows go to the last part.</div>
+        <div class="mc-desc">Divides total content into an exact number of equal-sized output files.</div>
       </div>
       <div class="mode-card" data-mode="rows" onclick="setMode('rows')">
         <span class="mc-badge">Fixed Count</span>
         <div class="mc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="mc-title">Fixed Items Per Part</div>
-        <div class="mc-desc">Each output file contains exactly N rows, pages, or ZIP entries until the source is exhausted.</div>
+        <div class="mc-desc">Each output file contains exactly N rows, pages, or ZIP entries.</div>
       </div>
       <div class="mode-card" data-mode="size" onclick="setMode('size')">
         <span class="mc-badge">By Size</span>
         <div class="mc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="mc-title">Target File Size (MB)</div>
-        <div class="mc-desc">Estimates average row/entry byte size to produce output files of approximately N megabytes each.</div>
+        <div class="mc-desc">Produces output files of approximately N megabytes each.</div>
       </div>
       <div class="mode-card" data-mode="range" onclick="setMode('range')">
         <span class="mc-badge">Custom Range</span>
         <div class="mc-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div class="mc-title">Extract a Range</div>
-        <div class="mc-desc">Extract a specific segment into one output file — e.g. rows 100–500, pages 5–20, or files 10–25.</div>
+        <div class="mc-desc">Extract a specific segment — e.g. rows 100–500, pages 5–20.</div>
       </div>
     </div>
     <div class="alert alert-warn" id="modeWarn" style="margin-top:12px;">
@@ -503,46 +257,32 @@ input[type=file]{display:none;}
     </div>
   </div>
 
-  <!-- ── STEP 3 ── -->
-  <div class="step-header">
-    <div class="step-num">3</div>
-    <div class="step-title">Configure Parameters</div>
-  </div>
+  <div class="step-header"><div class="step-num">3</div><div class="step-title">Configure Parameters</div></div>
   <div class="card">
-    <!-- parts -->
     <div id="pp" class="param-row">
       <div class="param-group">
         <label class="param-label">Number of Output Files</label>
         <input class="param-input" type="number" id="numParts" value="10" min="2" max="10000" oninput="validate()">
         <div class="param-err-msg" id="e-parts"></div>
       </div>
-      <div class="param-group" style="padding-top:26px">
-        <span class="param-hint" id="h-parts">Load a file to preview</span>
-      </div>
+      <div class="param-group" style="padding-top:26px"><span class="param-hint" id="h-parts">Load a file to preview</span></div>
     </div>
-    <!-- rows -->
     <div id="pr" class="param-row hidden">
       <div class="param-group">
         <label class="param-label">Items Per Part</label>
         <input class="param-input" type="number" id="rowsPer" value="1000" min="1" oninput="validate()">
         <div class="param-err-msg" id="e-rows"></div>
       </div>
-      <div class="param-group" style="padding-top:26px">
-        <span class="param-hint" id="h-rows">Estimate: — parts</span>
-      </div>
+      <div class="param-group" style="padding-top:26px"><span class="param-hint" id="h-rows">Estimate: — parts</span></div>
     </div>
-    <!-- size -->
     <div id="ps" class="param-row hidden">
       <div class="param-group">
         <label class="param-label">Max MB Per Output File</label>
         <input class="param-input" type="number" id="sizeMb" value="10" min="0.1" step="0.5" oninput="validate()">
         <div class="param-err-msg" id="e-size"></div>
       </div>
-      <div class="param-group" style="padding-top:26px">
-        <span class="param-hint" id="h-size">Estimate: — parts</span>
-      </div>
+      <div class="param-group" style="padding-top:26px"><span class="param-hint" id="h-size">Estimate: — parts</span></div>
     </div>
-    <!-- range -->
     <div id="pn" class="param-row hidden">
       <div class="param-group">
         <label class="param-label">From (Item #)</label>
@@ -559,18 +299,11 @@ input[type=file]{display:none;}
     </div>
   </div>
 
-  <!-- ── STEP 4 ── -->
-  <div class="step-header">
-    <div class="step-num">4</div>
-    <div class="step-title">Process &amp; Download</div>
-  </div>
+  <div class="step-header"><div class="step-num">4</div><div class="step-title">Process &amp; Download</div></div>
   <div class="card">
     <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
     <div class="prog-meta">
-      <div class="status-row">
-        <div class="dot" id="dot"></div>
-        <span class="status-txt" id="statusTxt">Ready to process</span>
-      </div>
+      <div class="status-row"><div class="dot" id="dot"></div><span class="status-txt" id="statusTxt">Ready to process</span></div>
       <span class="prog-pct" id="progPct">0%</span>
     </div>
     <div class="btn-row">
@@ -583,12 +316,9 @@ input[type=file]{display:none;}
         Clear All
       </button>
     </div>
-
     <div class="result-box" id="resultBox">
       <div class="rb-head">
-        <div class="rb-icon">
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
+        <div class="rb-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div>
           <div class="rb-title" id="rbTitle">Split complete!</div>
           <div class="rb-sub">All parts packaged into a single ZIP file for download.</div>
@@ -602,31 +332,16 @@ input[type=file]{display:none;}
     </div>
   </div>
 
-  <!-- ── GUIDE ── -->
   <div class="divider"><div class="divider-line"></div><div class="divider-label">Reference Guide</div><div class="divider-line"></div></div>
   <div class="card">
     <div class="guide-grid">
-      <div class="guide-item">
-        <div class="guide-num">01</div>
-        <div><div class="guide-t">Equal Parts</div><div class="guide-d">Divides all rows/pages/files evenly into N files. Any remainder goes to the last part. Best for distributing work evenly.</div></div>
-      </div>
-      <div class="guide-item">
-        <div class="guide-num">02</div>
-        <div><div class="guide-t">Fixed Count</div><div class="guide-d">Each output file contains exactly N items. The final part may have fewer items if content doesn't divide evenly.</div></div>
-      </div>
-      <div class="guide-item">
-        <div class="guide-num">03</div>
-        <div><div class="guide-t">By File Size</div><div class="guide-d">Estimates in-memory bytes per row to produce ~N MB output files. Actual size varies by data density. Most accurate for CSV.</div></div>
-      </div>
-      <div class="guide-item">
-        <div class="guide-num">04</div>
-        <div><div class="guide-t">Custom Range</div><div class="guide-d">Extracts items between two positions into a single output file. Use 1-based item numbers. Ideal for targeted extraction.</div></div>
-      </div>
+      <div class="guide-item"><div class="guide-num">01</div><div><div class="guide-t">Equal Parts</div><div class="guide-d">Divides all rows/pages/files evenly into N files. Any remainder goes to the last part.</div></div></div>
+      <div class="guide-item"><div class="guide-num">02</div><div><div class="guide-t">Fixed Count</div><div class="guide-d">Each output file contains exactly N items. Final part may have fewer items.</div></div></div>
+      <div class="guide-item"><div class="guide-num">03</div><div><div class="guide-t">By File Size</div><div class="guide-d">Estimates bytes per row to produce ~N MB output files. Most accurate for CSV.</div></div></div>
+      <div class="guide-item"><div class="guide-num">04</div><div><div class="guide-t">Custom Range</div><div class="guide-d">Extracts items between two positions. Use 1-based item numbers.</div></div></div>
     </div>
     <table class="compat">
-      <thead>
-        <tr><th>MODE</th><th>CSV</th><th>XLSX / XLS</th><th>PDF</th><th>ZIP</th></tr>
-      </thead>
+      <thead><tr><th>MODE</th><th>CSV</th><th>XLSX/XLS</th><th>PDF</th><th>ZIP</th></tr></thead>
       <tbody>
         <tr><td class="c-lbl">Equal Parts</td><td class="c-yes">✓</td><td class="c-yes">✓</td><td class="c-yes">✓</td><td class="c-yes">✓</td></tr>
         <tr><td class="c-lbl">Fixed Count</td><td class="c-yes">✓</td><td class="c-yes">✓</td><td class="c-yes">✓</td><td class="c-yes">✓</td></tr>
@@ -634,37 +349,129 @@ input[type=file]{display:none;}
         <tr><td class="c-lbl">Custom Range</td><td class="c-yes">✓</td><td class="c-yes">✓</td><td class="c-yes">✓</td><td class="c-yes">✓</td></tr>
       </tbody>
     </table>
-    <div class="compat-note">✓ Full support &nbsp;&nbsp;≈ Approximate estimates (actual output size may vary)</div>
+    <div class="compat-note">✓ Full support &nbsp;≈ Approximate estimates (actual size may vary)</div>
   </div>
-
 </main>
 <div class="toast" id="toast"><div class="toast-dot"></div><span id="toastTxt"></span></div>
 
 <script>
 // ══════════════════════════════════════════════════════════════
+//  WORKER CODE — runs SheetJS in a background thread
+//  Inlined as a Blob so no extra files needed (works on GitHub Pages)
+// ══════════════════════════════════════════════════════════════
+const WORKER_CODE = `
+importScripts('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+
+// Parse file — returns header array + total row count
+// Stores sheet data internally for later slice requests
+let _ws = null;
+let _header = null;
+let _rowCount = 0;
+
+self.onmessage = function(ev) {
+  const msg = ev.data;
+  try {
+    if (msg.type === 'parse') {
+      const buf = msg.buf; // ArrayBuffer
+      const wb = XLSX.read(buf, {
+        type: 'array',
+        dense: true,
+        cellDates: false,
+        cellNF: false,
+        cellHTML: false,
+        sheetStubs: false
+      });
+      _ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(_ws, { header: 1, defval: '', raw: true });
+      _header = rows[0] || [];
+      _rowCount = rows.length - 1; // exclude header
+      // Store rows on worker for slicing
+      self._rows = rows;
+      self.postMessage({ type: 'parsed', total: _rowCount });
+
+    } else if (msg.type === 'slice') {
+      const { s, e, partNum } = msg;
+      const totalRows = self._rows.length - 1;
+      const safeS = Math.max(0, s);
+      const safeE = Math.min(totalRows, e);
+      if (safeS >= safeE) {
+        self.postMessage({ type: 'error', msg: 'Slice out of bounds: s=' + safeS + ' e=' + safeE + ' total=' + totalRows });
+        return;
+      }
+      // Cap at 100k rows per part — aoa_to_sheet crashes above this
+      const MAX_ROWS = 100000;
+      if ((safeE - safeS) > MAX_ROWS) {
+        self.postMessage({ type: 'error', msg: 'Part too large: ' + (safeE-safeS) + ' rows. Max is 100,000 rows per part. Please increase the number of parts.' });
+        return;
+      }
+      const chunk = [_header, ...self._rows.slice(safeS + 1, safeE + 1)];
+      const ws = XLSX.utils.aoa_to_sheet(chunk);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      // type:'array' returns ArrayBuffer directly — transfer it zero-copy
+      const data = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+      const ab = data instanceof ArrayBuffer ? data : data.buffer;
+      self.postMessage({ type: 'sliced', data: ab, partNum }, [ab]);
+    }
+  } catch(err) {
+    self.postMessage({ type: 'error', msg: err.message });
+  }
+};
+`;
+
+// Create a persistent worker for the session
+let xlWorker = null;
+
+function getXlWorker() {
+  if (xlWorker) return xlWorker;
+  const blob = new Blob([WORKER_CODE], { type: 'application/javascript' });
+  xlWorker = new Worker(URL.createObjectURL(blob));
+  return xlWorker;
+}
+
+function workerMsg(worker, payload, transfers) {
+  return new Promise((resolve, reject) => {
+    // Expect reply type: 'parse' -> 'parsed', 'slice' -> 'sliced'
+    const expectedType = payload.type === 'parse' ? 'parsed' : 'sliced';
+    const handler = (ev) => {
+      const d = ev.data;
+      if (d.type === 'error') {
+        worker.removeEventListener('message', handler);
+        reject(new Error(d.msg));
+      } else if (d.type === expectedType) {
+        worker.removeEventListener('message', handler);
+        resolve(d);
+      }
+      // ignore any other message types
+    };
+    worker.addEventListener('message', handler);
+    worker.onerror = (e) => { worker.removeEventListener('message', handler); reject(new Error(e.message || 'Worker error')); };
+    if (transfers) worker.postMessage(payload, transfers);
+    else worker.postMessage(payload);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
 //  APP STATE
 // ══════════════════════════════════════════════════════════════
 const A = {
-  file:null, ft:null, total:0, mode:'parts',
-  dark:false, blob:null, dlName:null,
+  file: null, ft: null, total: 0, mode: 'parts', dark: false,
+  blob: null, dlName: null,
   // CSV
-  csvLines:null, csvHeader:null, csvBPR:0,
-  // Excel
-  xlRows:null,
-  // PDF — stored as Uint8Array + cached doc (fixes ArrayBuffer detach bug)
-  pdfU8:null, pdfDoc:null,
+  csvLines: null, csvHeader: null, csvBPR: 0,
+  // PDF
+  pdfU8: null, pdfDoc: null,
   // ZIP
-  zipEntries:null, zipSrc:null,
+  zipEntries: null, zipSrc: null,
 };
 
 // ══════════════════════════════════════════════════════════════
 //  THEME
 // ══════════════════════════════════════════════════════════════
-function toggleTheme(){
-  A.dark=!A.dark;
-  document.body.classList.toggle('dark',A.dark);
-  document.getElementById('themeLbl').textContent=A.dark?'Light Mode':'Dark Mode';
-  // swap icon: sun ↔ moon
+function toggleTheme() {
+  A.dark = !A.dark;
+  document.body.classList.toggle('dark', A.dark);
+  document.getElementById('themeLbl').textContent = A.dark ? 'Light Mode' : 'Dark Mode';
   document.getElementById('themeIcon').innerHTML = A.dark
     ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
     : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
@@ -673,221 +480,212 @@ function toggleTheme(){
 // ══════════════════════════════════════════════════════════════
 //  DRAG & DROP
 // ══════════════════════════════════════════════════════════════
-function dzOver(e){e.preventDefault();document.getElementById('dropzone').classList.add('dragover');}
-function dzLeave(){document.getElementById('dropzone').classList.remove('dragover');}
-function dzDrop(e){e.preventDefault();dzLeave();if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);}
-function onFileSelect(inp){if(inp.files[0])loadFile(inp.files[0]);}
+function dzOver(e) { e.preventDefault(); document.getElementById('dropzone').classList.add('dragover'); }
+function dzLeave() { document.getElementById('dropzone').classList.remove('dragover'); }
+function dzDrop(e) { e.preventDefault(); dzLeave(); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); }
+function onFileSelect(inp) { if (inp.files[0]) loadFile(inp.files[0]); }
 
 // ══════════════════════════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════════════════════════
-const EXT  = n=>n.split('.').pop().toLowerCase();
-const ICON = e=>({csv:'📊',xlsx:'📗',xls:'📗',pdf:'📕',zip:'🗜️'}[e]||'📄');
-const LBL  = e=>e==='pdf'?'pages':e==='zip'?'files':'rows';
-const FMT  = n=>Number(n).toLocaleString('en-IN');
-const FMTB = b=>b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(2)+' MB';
+const EXT  = n => n.split('.').pop().toLowerCase();
+const ICON = e => ({ csv:'📊', xlsx:'📗', xls:'📗', pdf:'📕', zip:'🗜️' }[e] || '📄');
+const LBL  = e => e === 'pdf' ? 'pages' : e === 'zip' ? 'files' : 'rows';
+const FMT  = n => Number(n).toLocaleString('en-IN');
+const FMTB = b => b < 1024 ? b + ' B' : b < 1048576 ? (b/1024).toFixed(1) + ' KB' : (b/1048576).toFixed(2) + ' MB';
 
 // ══════════════════════════════════════════════════════════════
 //  LOAD FILE
 // ══════════════════════════════════════════════════════════════
-async function loadFile(file){
-  const ft=EXT(file.name);
-  if(!['csv','xlsx','xls','pdf','zip'].includes(ft)){
-    toast('Unsupported file type. Use CSV, XLSX, XLS, PDF, or ZIP.','e'); return;
+async function loadFile(file) {
+  const ft = EXT(file.name);
+  if (!['csv','xlsx','xls','pdf','zip'].includes(ft)) {
+    toast('Unsupported file type. Use CSV, XLSX, XLS, PDF, or ZIP.', 'e'); return;
   }
-  wipe(); A.file=file; A.ft=ft;
-  setStatus('run','Reading file…');
-  document.getElementById('bigFileWarn').classList.toggle('show', file.size>52428800);
-  try{
-    const buf=await file.arrayBuffer();
-    if(ft==='csv'){
-      const txt=new TextDecoder().decode(buf);
-      const lines=txt.split(/\r?\n/).filter(l=>l.trim());
-      if(lines.length<2) throw new Error('CSV has no data rows (file is empty or header-only).');
-      A.csvHeader=lines[0]; A.csvLines=lines;
-      A.total=lines.length-1;
-      A.csvBPR=buf.byteLength/A.total; // actual bytes per row
-    }else if(ft==='xlsx'||ft==='xls'){
-      const wb=XLSX.read(buf,{type:'array'});
-      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
-      if(rows.length<2) throw new Error('Spreadsheet has no data rows.');
-      A.xlRows=rows; A.total=rows.length-1;
-    }else if(ft==='pdf'){
-      if(typeof PDFLib==='undefined') throw new Error('pdf-lib library failed to load. Check your internet connection.');
-      A.pdfU8=new Uint8Array(buf);          // Uint8Array never gets "detached"
-      A.pdfDoc=await PDFLib.PDFDocument.load(A.pdfU8); // load once, reuse
-      A.total=A.pdfDoc.getPageCount();
-    }else if(ft==='zip'){
-      const z=await JSZip.loadAsync(buf);
-      const entries=Object.keys(z.files).filter(k=>!z.files[k].dir);
-      if(!entries.length) throw new Error('ZIP archive contains no files.');
-      A.zipEntries=entries; A.zipSrc=z; A.total=entries.length;
+  wipe(); A.file = file; A.ft = ft;
+  setStatus('run', 'Reading file…');
+  document.getElementById('bigFileWarn').classList.toggle('show', file.size > 52428800);
+
+  try {
+    const buf = await file.arrayBuffer();
+
+    if (ft === 'csv') {
+      const txt = new TextDecoder().decode(buf);
+      const lines = txt.split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) throw new Error('CSV has no data rows.');
+      A.csvHeader = lines[0]; A.csvLines = lines;
+      A.total = lines.length - 1;
+      A.csvBPR = buf.byteLength / A.total;
+
+    } else if (ft === 'xlsx' || ft === 'xls') {
+      setStatus('run', 'Parsing Excel in background worker… please wait');
+      const w = getXlWorker();
+      // Transfer buffer to worker (zero-copy, no main thread block)
+      const result = await workerMsg(w, { type: 'parse', buf }, [buf]);
+      A.total = result.total;
+
+    } else if (ft === 'pdf') {
+      if (typeof PDFLib === 'undefined') throw new Error('pdf-lib failed to load.');
+      A.pdfU8 = new Uint8Array(buf);
+      A.pdfDoc = await PDFLib.PDFDocument.load(A.pdfU8);
+      A.total = A.pdfDoc.getPageCount();
+
+    } else if (ft === 'zip') {
+      const z = await JSZip.loadAsync(buf);
+      const entries = Object.keys(z.files).filter(k => !z.files[k].dir);
+      if (!entries.length) throw new Error('ZIP archive contains no files.');
+      A.zipEntries = entries; A.zipSrc = z; A.total = entries.length;
     }
-    // Always sync range fields for all types
-    document.getElementById('fromN').value=1;
-    document.getElementById('toN').value=A.total;
-    // Update UI
-    document.getElementById('fbIcon').textContent=ICON(ft);
-    document.getElementById('fbName').textContent=file.name;
-    document.getElementById('fbMeta').textContent=`${ft.toUpperCase()} • ${FMTB(file.size)} • ${FMT(A.total)} ${LBL(ft)}`;
+
+    document.getElementById('fromN').value = 1;
+    document.getElementById('toN').value = A.total;
+    document.getElementById('fbIcon').textContent = ICON(ft);
+    document.getElementById('fbName').textContent = file.name;
+    document.getElementById('fbMeta').textContent = `${ft.toUpperCase()} • ${FMTB(file.size)} • ${FMT(A.total)} ${LBL(ft)}`;
     document.getElementById('fileBar').classList.add('show');
-    document.getElementById('runBtn').disabled=false;
+    document.getElementById('runBtn').disabled = false;
     validate(); modeWarnCheck();
-    setStatus('ready','File loaded — ready to split');
-    toast(`Loaded: ${file.name}  (${FMT(A.total)} ${LBL(ft)})`,'s');
-  }catch(err){
-    wipe(); setStatus('err','Load failed: '+err.message);
-    toast('Failed to load: '+err.message,'e'); console.error(err);
-  }
-}
+    setStatus('ready', 'File loaded — ready to split');
+    toast(`Loaded: ${file.name} (${FMT(A.total)} ${LBL(ft)})`, 's');
 
-// ══════════════════════════════════════════════════════════════
-//  MODE
-// ══════════════════════════════════════════════════════════════
-function setMode(m){
-  A.mode=m;
-  document.querySelectorAll('.mode-card').forEach(c=>c.classList.toggle('sel',c.dataset.mode===m));
-  ['parts','rows','size','range'].forEach(x=>{
-    const map={parts:'pp',rows:'pr',size:'ps',range:'pn'};
-    document.getElementById(map[x]).classList.toggle('hidden',x!==m);
-  });
-  validate(); modeWarnCheck();
-}
-function modeWarnCheck(){
-  const el=document.getElementById('modeWarn');
-  const tx=document.getElementById('modeWarnTxt');
-  if(A.mode==='size'&&(A.ft==='pdf'||A.ft==='zip')){
-    tx.textContent=`"By File Size" uses approximate estimation for ${A.ft.toUpperCase()} files. For precise splitting, use "Equal Parts" or "Fixed Count" instead.`;
-    el.classList.add('show');
-  }else el.classList.remove('show');
-}
-
-// ══════════════════════════════════════════════════════════════
-//  VALIDATION + HINTS
-// ══════════════════════════════════════════════════════════════
-function bpr(){
-  if(A.ft==='csv') return Math.max(1,A.csvBPR);
-  if(A.ft==='xlsx'||A.ft==='xls') return Math.max(1,(A.xlRows[1]||[]).length)*50;
-  return Math.max(1, A.file ? A.file.size/A.total : 512);
-}
-function setErr(id,msg){
-  const el=document.getElementById(id);
-  if(!el) return;
-  el.textContent=msg; el.classList.toggle('show',!!msg);
-}
-function setInvalid(id,bad){
-  const el=document.getElementById(id);
-  if(el) el.classList.toggle('err',bad);
-}
-
-function validate(){
-  const tot=A.total, m=A.mode;
-  if(m==='parts'){
-    const v=parseInt(document.getElementById('numParts').value);
-    const bad=!v||v<2;
-    setInvalid('numParts',bad);
-    setErr('e-parts', bad?'Minimum 2 parts required.':tot>0&&v>tot?`Cannot exceed ${FMT(tot)} (total items).`:'');
-    if(!bad&&tot>0){
-      const cap=Math.min(v,tot);
-      document.getElementById('h-parts').textContent=`~${FMT(Math.ceil(tot/cap))} items per part`;
-    }
-  }
-  if(m==='rows'){
-    const v=parseInt(document.getElementById('rowsPer').value);
-    const bad=!v||v<1;
-    setInvalid('rowsPer',bad);
-    setErr('e-rows',bad?'Must be at least 1.':'');
-    if(!bad&&tot>0) document.getElementById('h-rows').textContent=`Estimate: ${FMT(Math.ceil(tot/v))} parts`;
-  }
-  if(m==='size'){
-    const v=parseFloat(document.getElementById('sizeMb').value);
-    const bad=!v||v<=0;
-    setInvalid('sizeMb',bad);
-    setErr('e-size',bad?'Must be greater than 0 MB.':'');
-    if(!bad&&tot>0){
-      const ipc=Math.max(1,Math.floor((v*1048576)/bpr()));
-      document.getElementById('h-size').textContent=`Estimate: ~${FMT(Math.ceil(tot/ipc))} parts`;
-    }
-  }
-  if(m==='range'){
-    const s=parseInt(document.getElementById('fromN').value),e2=parseInt(document.getElementById('toN').value);
-    let msg='';
-    if(!s||!e2||s<1||e2<1) msg='Enter valid positive numbers.';
-    else if(s>e2) msg='"From" must be ≤ "To".';
-    else if(tot>0&&e2>tot) msg=`"To" exceeds total (${FMT(tot)}).`;
-    setErr('e-range',msg);
-    if(!msg&&s&&e2) document.getElementById('h-range').textContent=`${FMT(e2-s+1)} items selected → 1 output file`;
+  } catch(err) {
+    wipe(); setStatus('err', 'Load failed: ' + err.message);
+    toast('Failed to load: ' + err.message, 'e'); console.error(err);
   }
 }
 
 // ══════════════════════════════════════════════════════════════
 //  CLEAR
 // ══════════════════════════════════════════════════════════════
-function wipe(){
-  Object.assign(A,{file:null,ft:null,total:0,csvLines:null,csvHeader:null,csvBPR:0,
-    xlRows:null,pdfU8:null,pdfDoc:null,zipEntries:null,zipSrc:null,blob:null,dlName:null});
+function wipe() {
+  Object.assign(A, {
+    file:null, ft:null, total:0,
+    csvLines:null, csvHeader:null, csvBPR:0,
+    pdfU8:null, pdfDoc:null,
+    zipEntries:null, zipSrc:null,
+    blob:null, dlName:null
+  });
 }
-function clearFile(){
+function clearFile() {
   wipe();
   document.getElementById('fileBar').classList.remove('show');
   document.getElementById('bigFileWarn').classList.remove('show');
   document.getElementById('modeWarn').classList.remove('show');
-  document.getElementById('runBtn').disabled=true;
-  document.getElementById('fi').value='';
-  document.getElementById('fromN').value=1;
-  document.getElementById('toN').value=1;
-  setProgress(0); setStatus('ready','Ready to process'); hideResult();
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('fi').value = '';
+  document.getElementById('fromN').value = 1;
+  document.getElementById('toN').value = 1;
+  setProgress(0); setStatus('ready', 'Ready to process'); hideResult();
 }
-function clearAll(){
+function clearAll() {
   clearFile();
-  document.getElementById('numParts').value=10;
-  document.getElementById('rowsPer').value=1000;
-  document.getElementById('sizeMb').value=10;
+  document.getElementById('numParts').value = 10;
+  document.getElementById('rowsPer').value = 1000;
+  document.getElementById('sizeMb').value = 10;
   setMode('parts');
-  ['e-parts','e-rows','e-size','e-range'].forEach(id=>setErr(id,''));
-  ['numParts','rowsPer','sizeMb','fromN','toN'].forEach(id=>setInvalid(id,false));
-  toast('All fields cleared','s');
+  ['e-parts','e-rows','e-size','e-range'].forEach(id => setErr(id, ''));
+  toast('All fields cleared', 's');
 }
 
 // ══════════════════════════════════════════════════════════════
-//  COMPUTE INDICES
+//  MODE
 // ══════════════════════════════════════════════════════════════
-function indices(){
-  const tot=A.total, m=A.mode;
-  if(tot===0) throw new Error('File has no splittable content.');
-  if(m==='parts'){
-    const raw=parseInt(document.getElementById('numParts').value);
-    if(!raw||raw<2) throw new Error('Number of parts must be at least 2.');
-    const n=Math.min(raw,tot); // cap — prevents crash when n > total
-    const idx=[];
-    for(let i=0;i<n;i++){
-      const s=Math.floor(i*tot/n),e=Math.floor((i+1)*tot/n);
-      if(e>s) idx.push([s,e]);
+function setMode(m) {
+  A.mode = m;
+  document.querySelectorAll('.mode-card').forEach(c => c.classList.toggle('sel', c.dataset.mode === m));
+  ['parts','rows','size','range'].forEach(x => {
+    const map = { parts:'pp', rows:'pr', size:'ps', range:'pn' };
+    document.getElementById(map[x]).classList.toggle('hidden', x !== m);
+  });
+  validate(); modeWarnCheck();
+}
+function modeWarnCheck() {
+  const el = document.getElementById('modeWarn'), tx = document.getElementById('modeWarnTxt');
+  if (A.mode === 'size' && (A.ft === 'pdf' || A.ft === 'zip')) {
+    tx.textContent = `"By File Size" uses approximate estimation for ${A.ft.toUpperCase()} files. Use "Equal Parts" or "Fixed Count" for precise splitting.`;
+    el.classList.add('show');
+  } else el.classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  VALIDATION
+// ══════════════════════════════════════════════════════════════
+function bpr() { return Math.max(1, A.ft === 'csv' ? A.csvBPR : A.file ? A.file.size / Math.max(1, A.total) : 512); }
+function setErr(id, msg) { const el = document.getElementById(id); if (!el) return; el.textContent = msg; el.classList.toggle('show', !!msg); }
+function setInvalid(id, bad) { const el = document.getElementById(id); if (el) el.classList.toggle('err', bad); }
+
+function validate() {
+  const tot = A.total, m = A.mode;
+  if (m === 'parts') {
+    const v = parseInt(document.getElementById('numParts').value), bad = !v || v < 2;
+    setInvalid('numParts', bad);
+    const isXl = (A.ft === 'xlsx' || A.ft === 'xls');
+    const rowsPerPart = tot > 0 ? Math.ceil(tot / Math.max(1, Math.min(v, tot))) : 0;
+    const xlTooLarge = isXl && rowsPerPart > 100000;
+    let errMsg = bad ? 'Minimum 2 parts required.' : tot > 0 && v > tot ? `Cannot exceed ${FMT(tot)} total items.` : xlTooLarge ? `Each part has ${FMT(rowsPerPart)} rows. Excel max is 1,00,000 per part — use at least ${FMT(Math.ceil(tot/100000))} parts.` : '';
+    setErr('e-parts', errMsg);
+    if (!bad && tot > 0) { const cap = Math.min(v, tot); document.getElementById('h-parts').textContent = `~${FMT(Math.ceil(tot/cap))} rows per part`; }
+  }
+  if (m === 'rows') {
+    const v = parseInt(document.getElementById('rowsPer').value), bad = !v || v < 1;
+    setInvalid('rowsPer', bad);
+    const isXl2 = (A.ft === 'xlsx' || A.ft === 'xls');
+    const xlRowsErr = isXl2 && v > 100000 ? `Excel max is 1,00,000 rows per part.` : '';
+    setErr('e-rows', bad ? 'Must be at least 1.' : xlRowsErr);
+    if (!bad && tot > 0) document.getElementById('h-rows').textContent = `Estimate: ${FMT(Math.ceil(tot/v))} parts`;
+  }
+  if (m === 'size') {
+    const v = parseFloat(document.getElementById('sizeMb').value), bad = !v || v <= 0;
+    setInvalid('sizeMb', bad); setErr('e-size', bad ? 'Must be greater than 0 MB.' : '');
+    if (!bad && tot > 0) {
+      const ipc = Math.max(1, Math.floor((v*1048576) / bpr()));
+      document.getElementById('h-size').textContent = `Estimate: ~${FMT(Math.ceil(tot/ipc))} parts`;
     }
+  }
+  if (m === 'range') {
+    const s = parseInt(document.getElementById('fromN').value), e2 = parseInt(document.getElementById('toN').value);
+    let msg = '';
+    if (!s || !e2 || s < 1 || e2 < 1) msg = 'Enter valid positive numbers.';
+    else if (s > e2) msg = '"From" must be \u2264 "To".';
+    else if (tot > 0 && e2 > tot) msg = `"To" exceeds total (${FMT(tot)}).`;
+    setErr('e-range', msg);
+    if (!msg && s && e2) document.getElementById('h-range').textContent = `${FMT(e2-s+1)} items \u2192 1 output file`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  INDICES
+// ══════════════════════════════════════════════════════════════
+function indices() {
+  const tot = A.total, m = A.mode;
+  if (tot === 0) throw new Error('File has no splittable content.');
+  if (m === 'parts') {
+    const raw = parseInt(document.getElementById('numParts').value);
+    if (!raw || raw < 2) throw new Error('Number of parts must be at least 2.');
+    const n = Math.min(raw, tot), idx = [];
+    for (let i = 0; i < n; i++) { const s = Math.floor(i*tot/n), e = Math.floor((i+1)*tot/n); if (e > s) idx.push([s, e]); }
     return idx;
   }
-  if(m==='rows'){
-    const step=parseInt(document.getElementById('rowsPer').value);
-    if(!step||step<1) throw new Error('Items per part must be at least 1.');
-    const idx=[];
-    for(let i=0;i<tot;i+=step) idx.push([i,Math.min(i+step,tot)]);
+  if (m === 'rows') {
+    const step = parseInt(document.getElementById('rowsPer').value);
+    if (!step || step < 1) throw new Error('Items per part must be at least 1.');
+    const idx = [];
+    for (let i = 0; i < tot; i += step) idx.push([i, Math.min(i+step, tot)]);
     return idx;
   }
-  if(m==='range'){
-    const s=parseInt(document.getElementById('fromN').value)-1;
-    const e=parseInt(document.getElementById('toN').value);
-    if(isNaN(s)||isNaN(e)) throw new Error('Enter valid From/To numbers.');
-    if(s<0) throw new Error('"From" must be at least 1.');
-    if(e>tot) throw new Error(`"To" (${e}) exceeds total items (${FMT(tot)}).`);
-    if(s>=e) throw new Error('"From" must be less than "To".');
-    return [[s,e]];
+  if (m === 'range') {
+    const s = parseInt(document.getElementById('fromN').value) - 1, e = parseInt(document.getElementById('toN').value);
+    if (isNaN(s) || isNaN(e)) throw new Error('Enter valid From/To numbers.');
+    if (s < 0) throw new Error('"From" must be at least 1.');
+    if (e > tot) throw new Error(`"To" (${e}) exceeds total (${FMT(tot)}).`);
+    if (s >= e) throw new Error('"From" must be less than "To".');
+    return [[s, e]];
   }
-  if(m==='size'){
-    const mb=parseFloat(document.getElementById('sizeMb').value);
-    if(!mb||mb<=0) throw new Error('Target size must be greater than 0 MB.');
-    const ipc=Math.max(1,Math.floor((mb*1048576)/bpr()));
-    const idx=[];
-    for(let i=0;i<tot;i+=ipc) idx.push([i,Math.min(i+ipc,tot)]);
+  if (m === 'size') {
+    const mb = parseFloat(document.getElementById('sizeMb').value);
+    if (!mb || mb <= 0) throw new Error('Target size must be greater than 0 MB.');
+    const ipc = Math.max(1, Math.floor((mb*1048576) / bpr())), idx = [];
+    for (let i = 0; i < tot; i += ipc) idx.push([i, Math.min(i+ipc, tot)]);
     return idx;
   }
   return [];
@@ -896,129 +694,125 @@ function indices(){
 // ══════════════════════════════════════════════════════════════
 //  RUNNER
 // ══════════════════════════════════════════════════════════════
-async function runSplit(){
-  if(!A.file) return;
-  const btn=document.getElementById('runBtn');
-  btn.disabled=true; setStatus('run','Splitting…'); setProgress(0); hideResult();
+async function runSplit() {
+  if (!A.file) return;
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true; setStatus('run', 'Splitting…'); setProgress(0); hideResult();
 
   let idx;
-  try{ idx=indices(); }
-  catch(e){ toast(e.message,'e'); setStatus('err',e.message); btn.disabled=false; return; }
-  if(!idx.length){ toast('No valid split could be computed.','e'); btn.disabled=false; return; }
+  try { idx = indices(); }
+  catch(e) { toast(e.message, 'e'); setStatus('err', e.message); btn.disabled = false; return; }
+  if (!idx.length) { toast('No valid split computed.', 'e'); btn.disabled = false; return; }
 
-  try{
-    const zip=new JSZip();
-    const ft=A.ft, base=A.file.name.replace(/\.[^.]+$/,'');
+  try {
+    const zip = new JSZip(), ft = A.ft, base = A.file.name.replace(/\.[^.]+$/, '');
 
-    for(let i=0;i<idx.length;i++){
-      const[s,e]=idx[i];
-      setStatus('run',`Processing part ${i+1} of ${idx.length}…`);
-      setProgress(Math.round(i/idx.length*88));
+    for (let i = 0; i < idx.length; i++) {
+      const [s, e] = idx[i];
+      setStatus('run', `Processing part ${i+1} of ${idx.length}…`);
+      setProgress(Math.round(i / idx.length * 88));
 
-      let data,name;
-      if(ft==='csv'){
-        data=mkCsv(s,e); name=`${base}_part${i+1}.csv`;
-      }else if(ft==='xlsx'||ft==='xls'){
-        data=mkXl(s,e); name=`${base}_part${i+1}.xlsx`; // always xlsx output
-      }else if(ft==='pdf'){
-        data=await mkPdf(s,e); name=`${base}_part${i+1}.pdf`;
-      }else if(ft==='zip'){
-        data=await mkZip(s,e); name=`${base}_part${i+1}.zip`;
+      let data, name;
+      if (ft === 'csv') {
+        data = mkCsv(s, e); name = `${base}_part${i+1}.csv`;
+      } else if (ft === 'xlsx' || ft === 'xls') {
+        data = await mkXlWorker(s, e, i+1); name = `${base}_part${i+1}.xlsx`;
+      } else if (ft === 'pdf') {
+        data = await mkPdf(s, e); name = `${base}_part${i+1}.pdf`;
+      } else if (ft === 'zip') {
+        data = await mkZip(s, e); name = `${base}_part${i+1}.zip`;
       }
-      zip.file(name,data);
-      await new Promise(r=>setTimeout(r,0)); // yield to browser
+      zip.file(name, data);
+      await new Promise(r => setTimeout(r, 0));
     }
 
-    setStatus('run','Compressing output ZIP…'); setProgress(92);
-    const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE'},
-      m=>setProgress(92+Math.round(m.percent*.08))
-    );
-    A.blob=blob; A.dlName=`${base}_split_${idx.length}parts.zip`;
-    setProgress(100); setStatus('done',`Split complete — ${idx.length} parts created`);
-    showResult(idx); toast(`Done! ${idx.length} parts ready to download.`,'s');
-  }catch(err){
-    setStatus('err','Error: '+err.message);
-    toast('Split failed: '+err.message,'e'); console.error(err);
-  }finally{ btn.disabled=false; }
+    setStatus('run', 'Compressing output ZIP…'); setProgress(92);
+    const blob = await zip.generateAsync({ type:'blob', compression:'DEFLATE' },
+      m => setProgress(92 + Math.round(m.percent * .08)));
+    A.blob = blob; A.dlName = `${base}_split_${idx.length}parts.zip`;
+    setProgress(100); setStatus('done', `Split complete — ${idx.length} parts created`);
+    showResult(idx); toast(`Done! ${idx.length} parts ready.`, 's');
+
+  } catch(err) {
+    setStatus('err', 'Error: ' + err.message);
+    toast('Split failed: ' + err.message, 'e'); console.error(err);
+  } finally { btn.disabled = false; }
 }
 
 // ══════════════════════════════════════════════════════════════
-//  SPLITTER FUNCTIONS
+//  SPLITTERS
 // ══════════════════════════════════════════════════════════════
 
-// lines[0]=header, lines[1..n]=data; start/end = 0-based data indices
-function mkCsv(s,e){
-  return A.csvHeader+'\n'+A.csvLines.slice(s+1,e+1).join('\n');
+// CSV — stays on main thread (strings are cheap)
+function mkCsv(s, e) {
+  return A.csvHeader + '\n' + A.csvLines.slice(s+1, e+1).join('\n');
 }
 
-// rows[0]=header, rows[1..n]=data; same index convention
-function mkXl(s,e){
-  const header=A.xlRows[0]||[];
-  const chunk=[header,...A.xlRows.slice(s+1,e+1)];
-  const ws=XLSX.utils.aoa_to_sheet(chunk);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
-  return XLSX.write(wb,{type:'array',bookType:'xlsx'});
+// Excel — ask worker to slice (worker holds all rows in memory)
+async function mkXlWorker(s, e, partNum) {
+  const w = getXlWorker();
+  const result = await workerMsg(w, { type: 'slice', s, e, partNum });
+  return new Uint8Array(result.data);
 }
 
-// Uses cached pdfDoc (no repeated ArrayBuffer.load)
-async function mkPdf(s,e){
-  const doc=await PDFLib.PDFDocument.create();
-  const pages=Array.from({length:e-s},(_,i)=>s+i);
-  const copied=await doc.copyPages(A.pdfDoc,pages);
-  copied.forEach(p=>doc.addPage(p));
+// PDF — unchanged
+async function mkPdf(s, e) {
+  const doc = await PDFLib.PDFDocument.create();
+  const pages = Array.from({ length: e-s }, (_, i) => s+i);
+  const copied = await doc.copyPages(A.pdfDoc, pages);
+  copied.forEach(p => doc.addPage(p));
   return await doc.save();
 }
 
-async function mkZip(s,e){
-  const out=new JSZip();
-  for(const f of A.zipEntries.slice(s,e)){
+// ZIP — unchanged
+async function mkZip(s, e) {
+  const out = new JSZip();
+  for (const f of A.zipEntries.slice(s, e))
     out.file(f, await A.zipSrc.file(f).async('uint8array'));
-  }
-  return await out.generateAsync({type:'uint8array'});
+  return await out.generateAsync({ type: 'uint8array' });
 }
 
 // ══════════════════════════════════════════════════════════════
 //  DOWNLOAD
 // ══════════════════════════════════════════════════════════════
-function doDownload(){
-  if(!A.blob) return;
-  const u=URL.createObjectURL(A.blob);
-  const a=Object.assign(document.createElement('a'),{href:u,download:A.dlName});
+function doDownload() {
+  if (!A.blob) return;
+  const u = URL.createObjectURL(A.blob);
+  const a = Object.assign(document.createElement('a'), { href: u, download: A.dlName });
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(u),10000);
+  setTimeout(() => URL.revokeObjectURL(u), 10000);
 }
 
 // ══════════════════════════════════════════════════════════════
 //  UI HELPERS
 // ══════════════════════════════════════════════════════════════
-function setProgress(p){
-  document.getElementById('progFill').style.width=p+'%';
-  document.getElementById('progPct').textContent=Math.round(p)+'%';
+function setProgress(p) {
+  document.getElementById('progFill').style.width = p + '%';
+  document.getElementById('progPct').textContent = Math.round(p) + '%';
 }
-function setStatus(t,msg){
-  const d=document.getElementById('dot');
-  d.className='dot'+(t==='run'?' run':t==='done'?' done':t==='err'?' err':'');
-  document.getElementById('statusTxt').textContent=msg;
+function setStatus(t, msg) {
+  const d = document.getElementById('dot');
+  d.className = 'dot' + (t==='run'?' run':t==='done'?' done':t==='err'?' err':'');
+  document.getElementById('statusTxt').textContent = msg;
 }
-function showResult(idx){
+function showResult(idx) {
   document.getElementById('resultBox').classList.add('show');
-  document.getElementById('rbTitle').textContent=`Split complete — ${idx.length} files created`;
-  document.getElementById('rbStats').innerHTML=`
+  document.getElementById('rbTitle').textContent = `Split complete — ${idx.length} files created`;
+  document.getElementById('rbStats').innerHTML = `
     <div class="rb-stat"><strong>${FMT(idx.length)}</strong>Parts Created</div>
     <div class="rb-stat"><strong>${FMT(A.total)}</strong>Total ${LBL(A.ft)}</div>
     <div class="rb-stat"><strong>${A.ft.toUpperCase()}</strong>Source Format</div>
     <div class="rb-stat"><strong>${FMTB(A.blob.size)}</strong>ZIP Size</div>`;
 }
-function hideResult(){ document.getElementById('resultBox').classList.remove('show'); }
+function hideResult() { document.getElementById('resultBox').classList.remove('show'); }
 
-let _tt=null;
-function toast(msg,t='s'){
-  const el=document.getElementById('toast');
-  if(_tt) clearTimeout(_tt);
-  document.getElementById('toastTxt').textContent=msg;
-  el.className=`toast show ${t}`;
-  _tt=setTimeout(()=>el.className=`toast ${t}`,4000);
+let _tt = null;
+function toast(msg, t='s') {
+  const el = document.getElementById('toast');
+  if (_tt) clearTimeout(_tt);
+  document.getElementById('toastTxt').textContent = msg;
+  el.className = `toast show ${t}`;
+  _tt = setTimeout(() => el.className = `toast ${t}`, 4000);
 }
 </script>
 </body>
